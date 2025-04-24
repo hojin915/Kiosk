@@ -2,6 +2,8 @@ package kiosk;
 
 import java.util.*;
 
+import static kiosk.TextManager.padRight;
+
 public class Menu {
     private String menuName;
     private List<MenuItem> menuItems = new ArrayList<>();
@@ -33,7 +35,7 @@ public class Menu {
         maxMenuLength += 1;
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
-            System.out.printf("%-3d %-" + maxMenuLength + "s %-6d %s\n", menuNumber, item.getMenuName(), item.getPrice(), item.getDescription());
+            System.out.printf("%-2d. %-" + maxMenuLength + "s | %-6d | %s\n", menuNumber, item.getMenuName(), item.getPrice(), item.getDescription());
             menuNumber++;
         }
     }
