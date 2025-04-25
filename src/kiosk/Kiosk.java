@@ -56,27 +56,32 @@ public class Kiosk extends Print {
             menusNumber++;
         }
     }
+    @Override
+    protected void printFooter() {
+        System.out.printf("%-2d. %s\n", 0, "종료하기");
+    }
 
-    private int scan() {
+    // 스캔 받을 때 숫자가 아니거나, 범위를 넘어가면 -1 리턴, startOrder에서 처리해주기
+    private int scan(int boundary) {
         Scanner sc = new Scanner(System.in);
-        int select = 0;
+        int select;
         try {
             select = sc.nextInt();
+            select = checkBoundary(select, boundary);
         } catch (InputMismatchException e) {
             System.out.println("숫자 입력받기");
+            select = -1;
         }
         return select;
     }
-
-    /* 입력값(선택한 번호, 선택지 범위)
     private int checkBoundary(int input, int boundary){
-        if(input >= 1 && input <= boundary) {
+        if(input >= 0 && input <= boundary) {
             return input;
         } else {
             System.out.println("범위 밖의 숫자 선택");
             return -1;
         }
-    }*/
+    }
 
     // 메뉴목록 선택(버거 메뉴, 치킨 메뉴, 음료 메뉴)
     private Menu selectMenu(int input) {
@@ -94,6 +99,7 @@ public class Kiosk extends Print {
         // ordinal: state 관리, select: menu, mennuItem 선택 번호
         int ordinal = 1;
         int select = 0;
+        int boundary = 0;
         // Menu 추가될 때마다 Container 만들어주고
         // 여기에서 추가
         Menu burgerMenu = new BurgerMenuContainer();
@@ -102,28 +108,52 @@ public class Kiosk extends Print {
         getMenus(burgerMenu);
         getMenus(chickenMenu);
         getMenus(drinksMenu);
+        Menu selectedMenu = new Menu();
+        MenuItem selectedMenuItem = null;
         while (true) {
             switch (getState(ordinal)) {
                 case STEP_END -> {
-                    // 처음으로 돌아가기
-                    //System.out.println("처음으로 돌아갑니다");
-                    //ordinal++;
-                    // 빠져나가기
                     System.out.println("종료합니다");
                     return;
                 }
                 case STEP_START -> {
-                    this.print();
-                    select = scan();
+                    boundary = menus.size();
+                    if(select >= 0 && select <= boundary){
+                        this.print();
+                    }
+                    select = scan(boundary);
                     if(select == 0) ordinal -= 1;
-                    else ordinal+= 1;
+                    else if(select > 0){
+                        selectedMenu = selectMenu(select);
+                        ordinal+= 1;
+                    }
                 }
                 case STEP_MENUS -> {
-                    printMenu(select);
-                    select = scan();
+                    boundary = selectedMenu.getMenu().size();
+                    if(select >= 0 && select <= boundary) {
+                        this.printMenu(select);
+                    }
+                    select = scan(boundary);
                     if(select == 0) ordinal -= 1;
-                    else ordinal += 1;
-
+                    else if(select > 0) {
+                        selectedMenuItem = selectedMenu.getMenu().get(select - 1);
+                        ordinal += 1;
+                    }
+                }
+                case STEP_MENUITEMS -> {
+                    if(selectedMenuItem != null) {
+                        selectedMenuItem.printMenuItem();
+                        select = 0;
+                        ordinal = 1;
+                    } else{
+                        System.out.println("MenuItem is null");
+                        ordinal = 0;
+                    }
+                    System.out.println("처음부터 시작하시겠습니까?");
+                    System.out.println("0 . 처음으로     1 . 종료");
+                    int temp = scan(1);
+                    if(temp == 0) ordinal = 1;
+                    if(temp == 1) ordinal = 0;
                 }
             }
         }

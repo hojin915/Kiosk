@@ -12,7 +12,7 @@ public class Menu extends Print {
     public Menu(String menuName) {
         this.menuName = menuName;
     }
-
+    public Menu() {}
     // 한번에 메뉴리스트를 넣기
     public void setMenuItems(List<MenuItem> menuItems) {
         this.menuItems = menuItems;
@@ -20,17 +20,15 @@ public class Menu extends Print {
 
     // 메뉴이름 리턴받기
     public String getMenuName() {
-        return menuName;
+        return this.menuName;
     }
-
     // 메뉴리스트 리턴받기
     public List<MenuItem> getMenu() {
-        return menuItems;
+        return this.menuItems;
     }
-
     // menuItem 하나씩 추가하기
     public void addMenuItem(MenuItem menuItem) {
-        menuItems.add(menuItem);
+        this.menuItems.add(menuItem);
     }
 
     @Override
@@ -44,7 +42,7 @@ public class Menu extends Print {
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
             // 메뉴번호. 메뉴이름 | 가격 | 설명 형식으로 출력
-            System.out.printf("%-2d. %-" + maxMenuLength + "s | %-6d | %s\n", menuNumber, item.getMenuName(), item.getPrice(), item.getDescription());
+            System.out.printf("%-2d. %-" + maxMenuLength + "s | %-6d | %s\n", item.getMenuId(), item.getMenuName(), item.getPrice(), item.getDescription());
             menuNumber++;
         }
     }

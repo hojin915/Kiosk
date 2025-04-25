@@ -9,7 +9,7 @@ abstract class Print {
 
     protected abstract void printBody();
 
-    private void printFooter() {
-        System.out.println("0 . 종료");
+    protected void printFooter() {
+        System.out.println("0 . 뒤로가기");
     }
 }
