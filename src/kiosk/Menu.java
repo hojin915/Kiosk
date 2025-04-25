@@ -4,7 +4,7 @@ import java.util.*;
 
 import static kiosk.TextManager.padRight;
 
-public class Menu {
+public class Menu extends Print {
     private String menuName;
     private List<MenuItem> menuItems = new ArrayList<>();
 
@@ -12,23 +12,32 @@ public class Menu {
     public Menu(String menuName) {
         this.menuName = menuName;
     }
+
     // 한번에 메뉴리스트를 넣기
     public void setMenuItems(List<MenuItem> menuItems) {
         this.menuItems = menuItems;
     }
+
+    // 메뉴이름 리턴받기
+    public String getMenuName() {
+        return menuName;
+    }
+
     // 메뉴리스트 리턴받기
     public List<MenuItem> getMenu() {
         return menuItems;
     }
+
     // menuItem 하나씩 추가하기
     public void addMenuItem(MenuItem menuItem) {
         menuItems.add(menuItem);
     }
 
-    public void printMenu() {
+    @Override
+    public void printBody() {
         int menuNumber = 1;
         int maxMenuLength = 0;
-        for(MenuItem item : menuItems) {
+        for (MenuItem item : menuItems) {
             maxMenuLength = Math.max(maxMenuLength, item.getMenuName().length());
         }
         maxMenuLength += 1;
