@@ -16,8 +16,7 @@ public class Kiosk extends Print {
         STEP_MENUS,
         STEP_MENUITEMS
     }
-
-    public State getState(int input) {
+    private State getState(int input) {
         for (State state : State.values()) {
             if (state.ordinal() == input) {
                 return state;
@@ -30,13 +29,10 @@ public class Kiosk extends Print {
         //return State.STEP_END;
     }
 
-
-    // 메뉴 리스트를 직접 넣어서 생성
+    // 사용하지는 않지만 일단 생성(menu 리스트 직접 넣어서 생성)
     public Kiosk(List<Menu> menus) {
         this.menus = menus;
     }
-
-    // 직접 메뉴 추가할 때 사용
     public Kiosk() {
     }
 
@@ -46,8 +42,8 @@ public class Kiosk extends Print {
         menus.add(menu);
     }
 
-    // 작동하면 제일먼저 실행
-    // 메뉴이름들 출력
+    // Kiosk 클래스는 추상클래스 Print 상속중
+    // printBody, printFooter
     @Override
     protected void printBody() {
         int menusNumber = 1;
@@ -61,7 +57,8 @@ public class Kiosk extends Print {
         System.out.printf("%-2d. %s\n", 0, "종료하기");
     }
 
-    // 스캔 받을 때 숫자가 아니거나, 범위를 넘어가면 -1 리턴, startOrder에서 처리해주기
+    // 스캔 받을 때 숫자가 아니거나, 범위를 넘어가면 -1 리턴
+    // -1의 분기는 startOrder에서 처리해주기
     private int scan(int boundary) {
         Scanner sc = new Scanner(System.in);
         int select;
@@ -96,10 +93,9 @@ public class Kiosk extends Print {
 
     public void startOrder() {
         State state = State.STEP_START;
-        // ordinal: state 관리, select: menu, mennuItem 선택 번호
-        int ordinal = 1;
-        int select = 0;
-        int boundary = 0;
+        int ordinal = 1; // state 관리, case 이동
+        int select = 0; // menu, menuItem 선택
+        int boundary = 0; // menu, menuItem 리스트의 사이즈로 scanner 응답 가능 범위
         // Menu 추가될 때마다 Container 만들어주고
         // 여기에서 추가
         Menu burgerMenu = new BurgerMenuContainer();
@@ -108,22 +104,24 @@ public class Kiosk extends Print {
         getMenus(burgerMenu);
         getMenus(chickenMenu);
         getMenus(drinksMenu);
-        Menu selectedMenu = new Menu();
-        MenuItem selectedMenuItem = null;
+        Menu selectedMenu = new Menu(); // while 내부에서 선언하면 자동으로 초기화
+        MenuItem selectedMenuItem = null; // case 안에서 선언하면 다른 case 에서 사용 불가
         while (true) {
             switch (getState(ordinal)) {
                 case STEP_END -> {
                     System.out.println("종료합니다");
-                    return;
+                    return; // startOrder 끝내기
                 }
                 case STEP_START -> {
                     boundary = menus.size();
+                    // scan을 통해 얻은 값이 기준을 만족하지 않으면 -1인 상태이다
+                    // 그런 경우에는 메뉴를 다시 보여주지 않고 scan부터 시작
                     if(select >= 0 && select <= boundary){
                         this.print();
                     }
                     select = scan(boundary);
-                    if(select == 0) ordinal -= 1;
-                    else if(select > 0){
+                    if(select == 0) ordinal -= 1; // 이전 state로, 여기서는 종료
+                    else if(select > 0){ // menu 선택하고 다음 state로
                         selectedMenu = selectMenu(select);
                         ordinal+= 1;
                     }
@@ -134,8 +132,8 @@ public class Kiosk extends Print {
                         this.printMenu(select);
                     }
                     select = scan(boundary);
-                    if(select == 0) ordinal -= 1;
-                    else if(select > 0) {
+                    if(select == 0) ordinal -= 1; // 이전 state로
+                    else if(select > 0) { // menuItem 선택하고 다음 state로
                         selectedMenuItem = selectedMenu.getMenu().get(select - 1);
                         ordinal += 1;
                     }
@@ -144,7 +142,6 @@ public class Kiosk extends Print {
                     if(selectedMenuItem != null) {
                         selectedMenuItem.printMenuItem();
                         select = 0;
-                        ordinal = 1;
                     } else{
                         System.out.println("MenuItem is null");
                         ordinal = 0;

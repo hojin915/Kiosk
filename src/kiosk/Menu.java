@@ -2,13 +2,11 @@ package kiosk;
 
 import java.util.*;
 
-import static kiosk.TextManager.padRight;
-
 public class Menu extends Print {
     private String menuName;
     private List<MenuItem> menuItems = new ArrayList<>();
 
-    // menu만들 때 필수적으로 메뉴이름까지 정하기
+    // menu 만들 때 필수적으로 메뉴이름까지 정하기
     public Menu(String menuName) {
         this.menuName = menuName;
     }
@@ -34,15 +32,10 @@ public class Menu extends Print {
     @Override
     public void printBody() {
         int menuNumber = 1;
-        int maxMenuLength = 0;
-        for (MenuItem item : menuItems) {
-            maxMenuLength = Math.max(maxMenuLength, item.getMenuName().length());
-        }
-        maxMenuLength += 1;
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
             // 메뉴번호. 메뉴이름 | 가격 | 설명 형식으로 출력
-            System.out.printf("%-2d. %-" + maxMenuLength + "s | %-6d | %s\n", item.getMenuId(), item.getMenuName(), item.getPrice(), item.getDescription());
+            item.printMenuItem();
             menuNumber++;
         }
     }
