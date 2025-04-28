@@ -5,20 +5,27 @@ package kiosk;
 public enum OrderState {
     STEP_END,
     STEP_START,
-    STEP_MENUS,
+    STEP_MENUES,
     STEP_MENUITEMS,
+    STEP_ITEMCOUNTS,
     STEP_BASKET;
 
-    public OrderState getState(int input) {
-        for (OrderState state : OrderState.values()) {
-            if (state.ordinal() == input) {
-                return state;
-            }
-        }
-        System.out.println(input + " process is not exist");
-        // 처음으로 돌아가기
-        return OrderState.STEP_START;
-        // 프로그램 끝내기
-        //return State.STEP_END;
+    public OrderState next() {
+        return switch (this) {
+            case STEP_START -> STEP_MENUES;
+            case STEP_MENUES -> STEP_MENUITEMS;
+            case STEP_MENUITEMS -> STEP_ITEMCOUNTS;
+            case STEP_ITEMCOUNTS -> STEP_BASKET;
+            default -> STEP_END;
+        };
+    }
+    public OrderState previous() {
+        return switch(this) {
+            case STEP_MENUES -> STEP_START;
+            case STEP_MENUITEMS -> STEP_MENUES;
+            case STEP_ITEMCOUNTS -> STEP_MENUITEMS;
+            case STEP_BASKET -> STEP_ITEMCOUNTS;
+            default -> STEP_END;
+        };
     }
 }

@@ -1,13 +1,17 @@
 package kiosk;
 
+import format.Print;
+
 import java.util.*;
 
 public class Menu extends Print {
+    private int MenuId;
     private String menuName;
     private List<MenuItem> menuItems = new ArrayList<>();
 
     // menu 만들 때 필수적으로 메뉴이름까지 정하기
-    public Menu(String menuName) {
+    public Menu(int MenuId, String menuName) {
+        this.MenuId = MenuId;
         this.menuName = menuName;
     }
     public Menu() {}
@@ -17,6 +21,9 @@ public class Menu extends Print {
     }
 
     // GETTER
+    protected int getMenuId() {
+        return this.MenuId;
+    }
     public String getMenuName() {
         return this.menuName;
     }
@@ -31,10 +38,13 @@ public class Menu extends Print {
 
     @Override
     public void printBody() {
+        int menuItemNum = 1;
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
             // 메뉴번호. 메뉴이름 | 가격 | 설명 형식으로 출력
+            System.out.print(menuItemNum + ". ");
             item.printMenuItem(0);
+            menuItemNum++;
         }
     }
 }

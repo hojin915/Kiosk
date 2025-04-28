@@ -1,5 +1,7 @@
 package kiosk;
 
+import format.MoneyFormat;
+import format.Print;
 import menucontainer.BurgerMenuContainer;
 import menucontainer.ChickenMenuContainer;
 import menucontainer.DrinksMenuContainer;
@@ -7,6 +9,8 @@ import menucontainer.DrinksMenuContainer;
 import java.util.*;
 
 public class Kiosk extends Print {
+    // 1회 주문 최대 주문량 관리
+    private final int maxOrderSize = 50;
     private List<Menu> menus = new ArrayList<>();
 
     // 사용하지는 않지만 일단 생성(menu 리스트 직접 넣어서 생성)
@@ -35,7 +39,6 @@ public class Kiosk extends Print {
             menusNumber++;
         }
     }
-
     @Override
     protected void printFooter() {
         System.out.printf("%-2d. %s\n", 0, "종료하기");
@@ -48,21 +51,17 @@ public class Kiosk extends Print {
         int select;
         try {
             select = sc.nextInt();
-            select = checkBoundary(select, boundary);
+            if(select >= 0 && select <= boundary){
+                return select;
+            } else {
+                System.out.println("범위 밖의 숫자 선택");
+                return -1;
+            }
         } catch (InputMismatchException e) {
             System.out.println("숫자 입력받기");
             select = -1;
         }
         return select;
-    }
-
-    private int checkBoundary(int input, int boundary) {
-        if (input >= 0 && input <= boundary) {
-            return input;
-        } else {
-            System.out.println("범위 밖의 숫자 선택");
-            return -1;
-        }
     }
 
     // 메뉴목록 선택(버거 메뉴, 치킨 메뉴, 음료 메뉴)
@@ -79,7 +78,6 @@ public class Kiosk extends Print {
 
     public void startOrder() {
         OrderState state = OrderState.STEP_START;
-        int ordinal = 1; // state 관리, case 이동
         int selectMenuNum = 0; // menu 선택
         int selectMenuItemNum = 0; // menuItem 선택
         int boundary = 0; // menu, menuItem 리스트의 사이즈로 scanner 응답 가능 범위
@@ -95,11 +93,13 @@ public class Kiosk extends Print {
         Menu selectedMenu = new Menu(); // while 내부에서 선언하면 자동으로 초기화
         MenuItem selectedMenuItem = null; // case 안에서 선언하면 다른 case 에서 사용 불가
         while (true) {
-            switch (state.getState(ordinal)) {
+            switch (state) {
+                // 프로그램 종료
                 case STEP_END -> {
                     System.out.println("종료합니다");
                     return; // startOrder 끝내기
                 }
+                // 처음 시작하면 보게되는 터미널, 메뉴 카테고리 선택 단계
                 case STEP_START -> {
                     boundary = menus.size();
                     // scan을 통해 얻은 값이 기준을 만족하지 않으면 -1인 상태이다
@@ -107,33 +107,41 @@ public class Kiosk extends Print {
                     if (selectMenuNum >= 0 && selectMenuNum <= boundary) {
                         this.print();
                     }
+                    // 장바구니 내용물이 있으면 주문, 취소 선택지 추가출력
                     if (!basket.getBasket().isEmpty()) {
                         System.out.println("");
                         System.out.println("< 주문 메뉴 >");
                         System.out.println(boundary + 1 + " . Orders     | Check your basket and order");
                         System.out.println(boundary + 2 + " . Cancel     | Clear your basket");
                     }
-                    selectMenuNum = scan(boundary + 2);
-                    if (selectMenuNum == 0) ordinal -= 1; // 이전 state로, 여기서는 종료
+                    // 장바구니가 비어있으면 선택지가 없기 때문에 범위 줄이기
+                    if(basket.getBasket().isEmpty()){
+                        selectMenuNum = scan(boundary);
+                    } else {
+                        selectMenuNum = scan(boundary + 2);
+                    }
+                    if (selectMenuNum == 0) state = state.previous(); // 이전 state로, 여기서는 종료
                     else if (selectMenuNum > 0 && selectMenuNum <= boundary) { // menu 선택하고 다음 state로
                         selectedMenu = selectMenu(selectMenuNum);
-                        ordinal += 1;
+                        state = state.next();
                     } else if (selectMenuNum > boundary) {
-                        ordinal = 4;
+                        state = OrderState.STEP_BASKET;
                     }
                 }
-                case STEP_MENUS -> {
+                // 상위메뉴 선택 후 해당 메뉴의 MenuItem 목록에서 메뉴 선택 단계
+                case STEP_MENUES -> {
                     boundary = selectedMenu.getMenu().size();
                     if (selectMenuNum >= 0 && selectMenuNum <= boundary) {
                         this.printMenu(selectMenuNum);
                     }
                     selectMenuItemNum = scan(boundary);
-                    if (selectMenuItemNum == 0) ordinal -= 1; // 이전 state로
+                    if (selectMenuItemNum == 0) state = state.previous(); // 이전 state로
                     else if (selectMenuItemNum > 0) { // menuItem 선택하고 다음 state로
                         selectedMenuItem = selectedMenu.getMenu().get(selectMenuItemNum - 1);
-                        ordinal += 1;
+                        state = state.next();
                     }
                 }
+                // MenuItem 선택 후 장바구니 추가, 취소 단계
                 case STEP_MENUITEMS -> {
                     if (selectedMenuItem != null) {
                         System.out.print("선택한메뉴: ");
@@ -141,19 +149,30 @@ public class Kiosk extends Print {
                         System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
                         System.out.println("1. 확인     2. 취소");
                         int temp = scan(2);
-                        if (temp == 2){
-                            ordinal = 2;
+                        if (temp == 2) {
+                            state = state.previous();
                         }
                         if (temp == 1) {
-                            basket.addMenuItem(selectedMenuItem);
-                            ordinal = 1;
-                            System.out.println(selectedMenuItem.getMenuName() + " 이 장바구니에 추가되었습니다.");
+                            state = state.next();
                         }
                     } else {
                         System.out.println("MenuItem is null");
-                        ordinal = 0;
+                        state = OrderState.STEP_END;
                     }
                 }
+                // MenuItem에서 장바구니 선택 후 선택한 메뉴 개수 선택 단계
+                case STEP_ITEMCOUNTS -> {
+                    System.out.println(selectedMenuItem.getMenuName() + " 를 몇개 담으시겠습니까? (최대 " + maxOrderSize + " 개)");
+                    int quantity = scan(maxOrderSize);
+                    basket.addMenuItem(selectedMenuItem, quantity);
+                    if (quantity != 0) {
+                        System.out.println(selectedMenuItem.getMenuName() + " 이 장바구니에 추가되었습니다.");
+                        state = OrderState.STEP_START;
+                    } else {
+                        System.out.println("1개 이상 선택해야합니다");
+                    }
+                }
+                // 장바구니 단계, 주문하거나 초기화면으로 이동
                 case STEP_BASKET -> {
                     if (selectMenuNum - boundary == 1) {
                         System.out.println("");
@@ -163,21 +182,20 @@ public class Kiosk extends Print {
                         System.out.println("Total: " + MoneyFormat.moneyFormat(basket.getTotalPrice()));
                         System.out.println("1. 주문하기      2. 메뉴판");
                         int temp = scan(2);
-                        if(temp == 1){
+                        if (temp == 1) {
                             System.out.println("주문이 완료되었습니다. 금액은 " + MoneyFormat.moneyFormat(basket.getTotalPrice()) + " 입니다");
                             basket.clearBasket();
                         }
-                        if(temp == 0 ) System.out.println("1, 2 중 하나를 입력해주세요");
+                        if (temp == 0) System.out.println("1, 2 중 하나를 입력해주세요");
+                        // 선언 이전에 사용하며 boundary 를 넘을 수 있기 때문에 초기화
                         selectMenuNum = 0;
-                        selectMenuItemNum = 0;
-                        ordinal = 1;
+                        state = OrderState.STEP_START;
                     }
                     if (selectMenuNum - boundary == 2) {
                         basket.clearBasket();
                         selectMenuNum = 0;
-                        selectMenuItemNum = 0;
                         System.out.println("");
-                        ordinal = 1;
+                        state = OrderState.STEP_START;
                     }
                 }
             }

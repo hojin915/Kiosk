@@ -1,4 +1,4 @@
-package kiosk;
+package format;
 
 // 돈 형식 통일
 public class MoneyFormat {
