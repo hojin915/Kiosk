@@ -140,13 +140,13 @@ public class Kiosk extends Print {
                 }
                 case STEP_MENUITEMS -> {
                     if(selectedMenuItem != null) {
-                        selectedMenuItem.printMenuItem();
+                        System.out.printf("선택한메뉴: ");
+                        selectedMenuItem.printMenuItem(1);
                         select = 0;
                     } else{
                         System.out.println("MenuItem is null");
                         ordinal = 0;
                     }
-                    System.out.println("처음부터 시작하시겠습니까?");
                     System.out.println("0 . 처음으로     1 . 종료");
                     int temp = scan(1);
                     if(temp == 0) ordinal = 1;

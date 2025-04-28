@@ -16,14 +16,14 @@ public class Menu extends Print {
         this.menuItems = menuItems;
     }
 
-    // 메뉴이름 리턴받기
+    // GETTER
     public String getMenuName() {
         return this.menuName;
     }
-    // 메뉴리스트 리턴받기
     public List<MenuItem> getMenu() {
         return this.menuItems;
     }
+
     // menuItem 하나씩 추가하기
     public void addMenuItem(MenuItem menuItem) {
         this.menuItems.add(menuItem);
@@ -31,12 +31,10 @@ public class Menu extends Print {
 
     @Override
     public void printBody() {
-        int menuNumber = 1;
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
             // 메뉴번호. 메뉴이름 | 가격 | 설명 형식으로 출력
-            item.printMenuItem();
-            menuNumber++;
+            item.printMenuItem(0);
         }
     }
 }

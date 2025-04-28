@@ -41,11 +41,16 @@ public class MenuItem {
         this.description = description;
     }
 
-    public void printMenuItem(){
-        // int menuNameLength = menuName.length(); // 가변형 메뉴길이
-        int menuNameLength = 20; // 정해진 메뉴길이
+    public void printMenuItem(int type){
+        int menuNameLength0 = 20; // 정렬시켜서 출력할 때
+        int menuNameLength1 = menuName.length(); // 하나만 출력할 때
         String priceString = "W " + price/1000 + "." + price%1000/100;
         // 품목번호. 메뉴이름 | 가격 | 설명 형식으로 출력
-        System.out.printf("%-2d. %-" + menuNameLength + "s | %-6s | %s\n", menuId, menuName, priceString, description);
+        if(type == 0) {
+            System.out.printf("%-2d. %-" + menuNameLength0 + "s | %-6s | %s\n", menuId, menuName, priceString, description);
+        }
+        if(type == 1) {
+            System.out.printf("%-" + menuNameLength1 + "s | %-6s | %s\n", menuName, priceString, description);
+        }
     }
 }
