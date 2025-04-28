@@ -44,7 +44,7 @@ public class MenuItem {
     public void printMenuItem(int type){
         int menuNameLength0 = 20; // 정렬시켜서 출력할 때
         int menuNameLength1 = menuName.length(); // 하나만 출력할 때
-        String priceString = "W " + price/1000 + "." + price%1000/100;
+        String priceString = MoneyFormat.moneyFormat(price);
         // 품목번호. 메뉴이름 | 가격 | 설명 형식으로 출력
         if(type == 0) {
             System.out.printf("%-2d. %-" + menuNameLength0 + "s | %-6s | %s\n", menuId, menuName, priceString, description);
