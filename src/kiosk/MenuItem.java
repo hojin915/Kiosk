@@ -51,10 +51,10 @@ public class MenuItem {
         String priceString = MoneyFormat.moneyFormat(price);
         // 메뉴이름 | 가격 | 설명 형식으로 출력 (번호 각자 추가)
         if(type == 0) {
-            System.out.printf("%-" + menuNameLength0 + "s | %-6s | %s\n", menuName, priceString, description);
+            System.out.printf("%-" + menuNameLength0 + "s | %-7s | %s\n", menuName, priceString, description);
         }
         if(type == 1) {
-            System.out.printf("%-" + menuNameLength1 + "s | %-6s | %s\n", menuName, priceString, description);
+            System.out.printf("%-" + menuNameLength1 + "s | %-7s | %s\n", menuName, priceString, description);
         }
     }
 

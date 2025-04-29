@@ -23,7 +23,7 @@ public class ShoppingBasket {
     public int getTotalPrice() {
         return totalPrice;
     }
-    public Map<MenuItem, Integer> getBasket() {
+    public Map<MenuItem, Integer> getBasketMap() {
         return basket;
     }
 

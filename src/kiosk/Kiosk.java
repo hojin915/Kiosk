@@ -37,6 +37,7 @@ public class Kiosk extends Print {
             System.out.printf("%-2d. %s\n", menu.getMenuId(), menu.getMenuName());
         }
     }
+
     @Override
     protected void printFooter() {
         System.out.printf("%-2d. %s\n", 0, "종료하기");
@@ -49,7 +50,7 @@ public class Kiosk extends Print {
         int select;
         try {
             select = sc.nextInt();
-            if(select >= 0 && select <= boundary){
+            if (select >= 0 && select <= boundary) {
                 return select;
             } else {
                 System.out.println("범위 밖의 숫자 선택");
@@ -64,17 +65,19 @@ public class Kiosk extends Print {
 
     // 메뉴목록 선택(버거 메뉴, 치킨 메뉴, 음료 메뉴)
     private Menu selectMenu(int input) {
-        int boundary = menus.size();
         return menus.get(input - 1);
     }
 
     // 메뉴목록중 선택한 메뉴 출력(버거 메뉴, 치킨 메뉴, 음료 메뉴)
     private void printMenu(int input) {
-        int boundary = menus.size();
-        menus.get(input - 1).print();
+        menus.stream()
+                .filter(menu -> menu.getMenuId() == input)
+                .findFirst()
+                .ifPresent(Print::print);
     }
 
     public void startOrder() {
+        OrderContext context = new OrderContext();
         OrderState state = OrderState.STEP_START;
         int selectMenuNum = 0; // menu 선택
         int selectMenuItemNum = 0; // menuItem 선택
@@ -90,8 +93,10 @@ public class Kiosk extends Print {
         getMenus(drinksMenu);
         Menu selectedMenu = new Menu(); // while 내부에서 선언하면 자동으로 초기화
         MenuItem selectedMenuItem = null; // case 안에서 선언하면 다른 case 에서 사용 불가
+        context.setMenus(menus);
+        context.setBasketClass(new ShoppingBasket());
         while (true) {
-            switch (state) {
+            switch (context.getState()) {
                 // 프로그램 종료
                 case STEP_END -> {
                     System.out.println("종료합니다");
@@ -99,122 +104,26 @@ public class Kiosk extends Print {
                 }
                 // 처음 시작하면 보게되는 터미널, 메뉴 카테고리 선택 단계
                 case STEP_START -> {
-                    boundary = menus.size();
-                    // scan을 통해 얻은 값이 기준을 만족하지 않으면 -1인 상태이다
-                    // 그런 경우에는 메뉴를 다시 보여주지 않고 scan부터 시작
-                    if (selectMenuNum >= 0 && selectMenuNum <= boundary) {
-                        this.print();
-                    }
-                    // 장바구니 내용물이 있으면 주문, 취소 선택지 추가출력
-                    if (!basket.getBasket().isEmpty()) {
-                        System.out.println("");
-                        System.out.println("< 주문 메뉴 >");
-                        System.out.println(boundary + 1 + " . Orders     | Check your basket and order");
-                        System.out.println(boundary + 2 + " . Cancel     | Clear your basket");
-                    }
-                    // 장바구니가 비어있으면 선택지가 없기 때문에 범위 줄이기
-                    if(basket.getBasket().isEmpty()){
-                        selectMenuNum = scan(boundary);
-                    } else {
-                        selectMenuNum = scan(boundary + 2);
-                    }
-                    if (selectMenuNum == 0) state = state.previous(); // 이전 state로, 여기서는 종료
-                    else if (selectMenuNum > 0 && selectMenuNum <= boundary) { // menu 선택하고 다음 state로
-                        selectedMenu = selectMenu(selectMenuNum);
-                        state = state.next();
-                    } else if (selectMenuNum > boundary) {
-                        state = OrderState.STEP_BASKET;
-                    }
+                    new StepStart().handle(context);
                 }
                 // 상위메뉴 선택 후 해당 메뉴의 MenuItem 목록에서 메뉴 선택 단계
                 case STEP_MENUES -> {
-                    boundary = selectedMenu.getMenu().size();
-                    if (selectMenuNum >= 0 && selectMenuNum <= boundary) {
-                        this.printMenu(selectMenuNum);
-                    }
-                    selectMenuItemNum = scan(boundary);
-                    if (selectMenuItemNum == 0) state = state.previous(); // 이전 state로
-                    else if (selectMenuItemNum > 0) { // menuItem 선택하고 다음 state로
-                        selectedMenuItem = selectedMenu.getMenu().get(selectMenuItemNum - 1);
-                        state = state.next();
-                    }
+                    new StepMenu().handle(context);
                 }
                 // MenuItem 선택 후 장바구니 추가, 취소 단계
                 case STEP_MENUITEMS -> {
-                    if (selectedMenuItem != null) {
-                        System.out.print("선택한메뉴: ");
-                        selectedMenuItem.printMenuItem(1);
-                        System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
-                        System.out.println("1. 확인     2. 취소");
-                        int temp = scan(2);
-                        if (temp == 2) {
-                            state = state.previous();
-                        } else if (temp == 1) {
-                            state = state.next();
-                        } else if (temp == 0){
-                            System.out.println("1, 2 중 하나를 입력해주세요");
-                        }
-                    } else {
-                        System.out.println("MenuItem is null");
-                        state = OrderState.STEP_END;
-                    }
+                    new StepMenuItems().handle(context);
                 }
                 // MenuItem에서 장바구니 선택 후 선택한 메뉴 개수 선택 단계
                 case STEP_ITEMCOUNTS -> {
-                    System.out.println(selectedMenuItem.getMenuName() + " 를 몇개 담으시겠습니까? (최대 " + maxOrderSize + " 개, 취소를 원하시면 0을 입력해주세요)");
-                    int quantity = scan(maxOrderSize);
-                    if (quantity > 0 && quantity <= maxOrderSize) {
-                        basket.addMenuItem(selectedMenuItem, quantity);
-                        System.out.println(selectedMenuItem.getMenuName() + " 이 장바구니에 추가되었습니다.");
-                        state = OrderState.STEP_START;
-                    } else if(quantity == 0) {
-                        state = OrderState.STEP_MENUES;
-                    } else {
-                        System.out.println("1개 이상, " + maxOrderSize + "개 이하 선택해야합니다");
-                    }
+                    new StepItemCounts().handle(context);
                 }
                 // 장바구니 단계, 주문하거나 초기화면으로 이동
                 case STEP_BASKET -> {
-                    if (selectMenuNum - boundary == 1) {
-                        System.out.println("");
-                        System.out.println("아래와 같이 주문하시겠습니까?");
-                        basket.printBasket(1);
-                        System.out.println("< 전체 금액 >");
-                        System.out.println("Total: " + MoneyFormat.moneyFormat(basket.getTotalPrice()));
-                        System.out.println("1. 주문하기      2. 메뉴판");
-                        int temp = scan(2);
-                        if (temp == 1) {
-                            state = OrderState.STEP_DISCOUNT;
-                        } else if (temp == 2) {
-                            System.out.println("메뉴로 이동합니다");
-                            state = OrderState.STEP_START;
-                        } else if (temp == 0){
-                            System.out.println("1, 2 중 하나를 입력해주세요");
-                        }
-                        // 선언 이전에 사용하며 boundary 를 넘을 수 있기 때문에 초기화
-                        selectMenuNum = 0;
-                    }
-                    if (selectMenuNum - boundary == 2) {
-                        basket.clearBasket();
-                        selectMenuNum = 0;
-                        System.out.println("");
-                        state = OrderState.STEP_START;
-                    }
+                    new StepBasket().handle(context);
                 }
                 case STEP_DISCOUNT -> {
-                    Discount customer = Discount.ORDINARY_PERSON;
-                    System.out.println("할인 정보를 입력해주세요");
-                    customer.printDiscount();
-                    customer = customer.getDiscount(scan(Discount.values().length));
-                    int price = basket.getTotalPrice();
-                    if(customer != null){
-                        System.out.println(price);
-                        System.out.println("주문이 완료되었습니다. 금액은 " + MoneyFormat.moneyFormat(price) + " 입니다");
-                        basket.clearBasket();
-                        state = OrderState.STEP_END;
-                    } else {
-                        System.out.println("번호 중 하나를 입력해주세요");
-                    }
+                    new StepDiscount().handle(context);
                 }
             }
         }
