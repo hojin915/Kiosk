@@ -78,11 +78,6 @@ public class Kiosk extends Print {
 
     public void startOrder() {
         OrderContext context = new OrderContext();
-        OrderState state = OrderState.STEP_START;
-        int selectMenuNum = 0; // menu 선택
-        int selectMenuItemNum = 0; // menuItem 선택
-        int boundary = 0; // menu, menuItem 리스트의 사이즈로 scanner 응답 가능 범위
-        ShoppingBasket basket = new ShoppingBasket();
         // Menu 추가될 때마다 Container 만들어주고
         // 여기에서 추가
         Menu burgerMenu = new BurgerMenuContainer();
@@ -91,8 +86,6 @@ public class Kiosk extends Print {
         getMenus(burgerMenu);
         getMenus(chickenMenu);
         getMenus(drinksMenu);
-        Menu selectedMenu = new Menu(); // while 내부에서 선언하면 자동으로 초기화
-        MenuItem selectedMenuItem = null; // case 안에서 선언하면 다른 case 에서 사용 불가
         context.setMenus(menus);
         context.setBasketClass(new ShoppingBasket());
         while (true) {
@@ -122,6 +115,7 @@ public class Kiosk extends Print {
                 case STEP_BASKET -> {
                     new StepBasket().handle(context);
                 }
+                // 할인율 적용 단계, 시스템 종료
                 case STEP_DISCOUNT -> {
                     new StepDiscount().handle(context);
                 }

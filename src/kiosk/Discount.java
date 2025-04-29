@@ -14,6 +14,7 @@ public enum Discount {
         this.discountPercent = percent;
     }
 
+    // 숫자(input)를 enum Discount 로 변환
     public Discount getDiscount(int input) {
         return switch (input) {
             case 1 -> ORDINARY_PERSON;
@@ -23,6 +24,8 @@ public enum Discount {
             default -> null;
         };
     }
+
+    // 할인율 적용 가격 리턴
     public int discountedPrice(int price) {
         return switch (this) {
             case ORDINARY_PERSON -> (price / 100) * (100 - ORDINARY_PERSON.discountPercent);
@@ -31,6 +34,7 @@ public enum Discount {
             case VETERAN -> (price / 100) * (100-VETERAN.discountPercent);
         };
     }
+
     public void printDiscount(){
         int customerNum = 1;
         for(Discount customer : Discount.values()){

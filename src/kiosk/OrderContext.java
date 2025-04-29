@@ -8,11 +8,12 @@ public class OrderContext {
     private MenuItem selectedMenuItem;  // 선택된 메뉴
     private int selectMenuNum = 0;  // 상위메뉴 선택단계에서 선택한 메뉴 숫자
     private int selectMenuItemNum = 0;  // 메뉴 선택단계에서 선택한 메뉴 숫자
-    private int tempNum = 0; // 출력 조절용(StepItemMenu에서 사용중, 제한사항 없으면 이후 boolean으로 변경)
+    private boolean alreadyPrinted = false; // 출력 관리(입력에 문제가 생겨도 목록을 다시 출력하지 않고 입력만 새로받음)
     private ShoppingBasket basket;  // 장바구니
     private final Scanner sc = new Scanner(System.in);
     private OrderState state = OrderState.STEP_START;   // 주문 단계(초기값 STEP_START)
 
+    // 매개변수와 같이 scan도 모든 단계에서 사용하기 때문에 context에 포함
     public int scan(int boundary) {
         int select;
         try {
@@ -30,6 +31,7 @@ public class OrderContext {
         return select;
     }
 
+    // <GETTER>
     public OrderContext getOrderContext(){
         return this;
     }
@@ -48,8 +50,8 @@ public class OrderContext {
     public int getSelectMenuItemNum(){
         return this.selectMenuItemNum;
     }
-    public int getTempNum(){
-        return this.tempNum;
+    public boolean getAlreadyPrinted(){
+        return this.alreadyPrinted;
     }
     public ShoppingBasket getBasketClass(){
         return this.basket;
@@ -58,6 +60,7 @@ public class OrderContext {
         return this.state;
     }
 
+    // <SETTER>
     public void setMenus(List<Menu> menus){
         this.menus = menus;
     }
@@ -70,8 +73,8 @@ public class OrderContext {
     public void setSelectMenuNum(int num){
         this.selectMenuNum = num;
     }
-    public void setTempNum(int num){
-        this.tempNum = num;
+    public void setAlreadyPrinted(boolean printed){
+        this.alreadyPrinted = printed;
     }
     public void setSelectMenuItemNum(int num){
         this.selectMenuItemNum = num;

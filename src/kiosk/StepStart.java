@@ -1,12 +1,13 @@
 package kiosk;
 
+// STEP_START
 public class StepStart implements OrderStep{
 
     private Menu selectMenu(OrderContext context, int input){
-        return context.getMenus().stream()
-                .filter(menu -> menu.getMenuId() == input)
-                .findFirst()
-                .orElse(null);
+        return context.getMenus().stream()  // menus를 stream으로 바꾸고
+                .filter(menu -> menu.getMenuId() == input)  // MenuId가 input과 같은 메뉴만 필터링
+                .findFirst()  // 위 조건을 만족하는 첫번째 요소 반환
+                .orElse(null);  // 없다면 null을 반환
     }
 
     private void printMenus(OrderContext context){

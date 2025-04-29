@@ -2,13 +2,14 @@ package kiosk;
 
 import format.MoneyFormat;
 
+// STEP_BASKET
 public class StepBasket implements OrderStep {
     @Override
     public void handle(OrderContext context){
         ShoppingBasket basket = context.getBasketClass();
         int boundary = context.getMenus().size();
         if(context.getSelectMenuNum() - boundary == 1){
-            if(context.getTempNum() == 0) {
+            if(!context.getAlreadyPrinted()) {
                 System.out.println("아래와 같이 주문하시겠습니까?");
                 basket.printBasket(1);
                 System.out.println("< 전체 금액 >");
@@ -16,14 +17,14 @@ public class StepBasket implements OrderStep {
                 System.out.println("1. 주문하기      2. 메뉴판");
             }
             int select = context.scan(2);
-            context.setTempNum(1);
+            context.setAlreadyPrinted(true);
             if(select == 1){
-                context.setTempNum(0);
+                context.setAlreadyPrinted(false);
                 context.setState(context.getState().next());
             } else if(select == 2){
                 System.out.println("메뉴로 이동합니다");
                 context.setSelectMenuNum(0);
-                context.setTempNum(0);
+                context.setAlreadyPrinted(false);
                 context.setState(OrderState.STEP_START);
             } else if(select == 0) {
                 System.out.println("1, 2 중 하나를 입력해주세요");
@@ -33,7 +34,7 @@ public class StepBasket implements OrderStep {
             basket.clearBasket();
             context.setBasketClass(basket);
             context.setSelectMenuNum(0);
-            context.setTempNum(0);
+            context.setAlreadyPrinted(false);
             context.setState(OrderState.STEP_START);
         }
     }

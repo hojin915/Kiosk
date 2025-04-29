@@ -2,13 +2,14 @@ package kiosk;
 
 import format.Print;
 
+// STEP_MENUES
 public class StepMenu implements OrderStep{
 
     private void printMenu(OrderContext context, int input) {
-        context.getMenus().stream()
-                .filter(menu -> menu.getMenuId() == input)
-                .findFirst()
-                .ifPresent(Print::print);
+        context.getMenus().stream()  // menus를 stream으로 변환
+                .filter(menu -> menu.getMenuId() == input)  // menuId가 input과 같은 메뉴 필터링
+                .findFirst() // 조건을 만족하는 첫번째 요소
+                .ifPresent(Print::print);  // 존재한다면 print(Menu 클래스의 print)
     }
 
     @Override

@@ -1,7 +1,5 @@
 package kiosk;
 
-
-// 순서를 사용하려면 state.ordinal()
 public enum OrderState {
     STEP_END,
     STEP_START,
@@ -11,6 +9,7 @@ public enum OrderState {
     STEP_BASKET,
     STEP_DISCOUNT;
 
+    // 다음 단계, 이전 단계
     public OrderState next() {
         return switch (this) {
             case STEP_END -> STEP_START;
