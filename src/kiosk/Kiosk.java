@@ -32,11 +32,9 @@ public class Kiosk extends Print {
     // 메뉴들의 목록을 출력
     @Override
     protected void printBody() {
-        int menusNumber = 1;
         System.out.println("< 메인 메뉴 >");
         for (Menu menu : menus) {
-            System.out.printf("%-2d. %s\n", menusNumber, menu.getMenuName());
-            menusNumber++;
+            System.out.printf("%-2d. %s\n", menu.getMenuId(), menu.getMenuName());
         }
     }
     @Override
