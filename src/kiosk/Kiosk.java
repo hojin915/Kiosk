@@ -7,7 +7,7 @@ import menucontainer.ChickenMenuContainer;
 import menucontainer.DrinksMenuContainer;
 
 import java.util.*;
-
+// test
 public class Kiosk extends Print {
     // 1회 주문 최대 주문량 관리
     private final int maxOrderSize = 50;
