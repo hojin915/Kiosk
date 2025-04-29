@@ -7,7 +7,7 @@ import menucontainer.ChickenMenuContainer;
 import menucontainer.DrinksMenuContainer;
 
 import java.util.*;
-// test
+
 public class Kiosk extends Print {
     // 1회 주문 최대 주문량 관리
     private final int maxOrderSize = 50;
@@ -149,9 +149,10 @@ public class Kiosk extends Print {
                         int temp = scan(2);
                         if (temp == 2) {
                             state = state.previous();
-                        }
-                        if (temp == 1) {
+                        } else if (temp == 1) {
                             state = state.next();
+                        } else if (temp == 0){
+                            System.out.println("1, 2 중 하나를 입력해주세요");
                         }
                     } else {
                         System.out.println("MenuItem is null");
@@ -160,14 +161,16 @@ public class Kiosk extends Print {
                 }
                 // MenuItem에서 장바구니 선택 후 선택한 메뉴 개수 선택 단계
                 case STEP_ITEMCOUNTS -> {
-                    System.out.println(selectedMenuItem.getMenuName() + " 를 몇개 담으시겠습니까? (최대 " + maxOrderSize + " 개)");
+                    System.out.println(selectedMenuItem.getMenuName() + " 를 몇개 담으시겠습니까? (최대 " + maxOrderSize + " 개, 취소를 원하시면 0을 입력해주세요)");
                     int quantity = scan(maxOrderSize);
-                    basket.addMenuItem(selectedMenuItem, quantity);
-                    if (quantity != 0) {
+                    if (quantity > 0 && quantity <= maxOrderSize) {
+                        basket.addMenuItem(selectedMenuItem, quantity);
                         System.out.println(selectedMenuItem.getMenuName() + " 이 장바구니에 추가되었습니다.");
                         state = OrderState.STEP_START;
+                    } else if(quantity == 0) {
+                        state = OrderState.STEP_MENUES;
                     } else {
-                        System.out.println("1개 이상 선택해야합니다");
+                        System.out.println("1개 이상, " + maxOrderSize + "개 이하 선택해야합니다");
                     }
                 }
                 // 장바구니 단계, 주문하거나 초기화면으로 이동
@@ -181,19 +184,36 @@ public class Kiosk extends Print {
                         System.out.println("1. 주문하기      2. 메뉴판");
                         int temp = scan(2);
                         if (temp == 1) {
-                            System.out.println("주문이 완료되었습니다. 금액은 " + MoneyFormat.moneyFormat(basket.getTotalPrice()) + " 입니다");
-                            basket.clearBasket();
+                            state = OrderState.STEP_DISCOUNT;
+                        } else if (temp == 2) {
+                            System.out.println("메뉴로 이동합니다");
+                            state = OrderState.STEP_START;
+                        } else if (temp == 0){
+                            System.out.println("1, 2 중 하나를 입력해주세요");
                         }
-                        if (temp == 0) System.out.println("1, 2 중 하나를 입력해주세요");
                         // 선언 이전에 사용하며 boundary 를 넘을 수 있기 때문에 초기화
                         selectMenuNum = 0;
-                        state = OrderState.STEP_START;
                     }
                     if (selectMenuNum - boundary == 2) {
                         basket.clearBasket();
                         selectMenuNum = 0;
                         System.out.println("");
                         state = OrderState.STEP_START;
+                    }
+                }
+                case STEP_DISCOUNT -> {
+                    Discount customer = Discount.ORDINARY_PERSON;
+                    System.out.println("할인 정보를 입력해주세요");
+                    customer.printDiscount();
+                    customer = customer.getDiscount(scan(Discount.values().length));
+                    int price = basket.getTotalPrice();
+                    if(customer != null){
+                        System.out.println(price);
+                        System.out.println("주문이 완료되었습니다. 금액은 " + MoneyFormat.moneyFormat(price) + " 입니다");
+                        basket.clearBasket();
+                        state = OrderState.STEP_END;
+                    } else {
+                        System.out.println("번호 중 하나를 입력해주세요");
                     }
                 }
             }
