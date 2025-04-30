@@ -17,7 +17,7 @@ public class Menu {
     }
 
     // GETTER
-    protected int getMenuId() {
+    public int getMenuId() {
         return this.MenuId;
     }
     public String getMenuName() {

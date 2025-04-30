@@ -1,5 +1,6 @@
 package kiosk;
 
+import kiosk.step.*;
 import menucontainer.BurgerMenuContainer;
 import menucontainer.ChickenMenuContainer;
 import menucontainer.DrinksMenuContainer;

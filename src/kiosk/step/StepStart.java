@@ -1,7 +1,12 @@
-package kiosk;
+package kiosk.step;
+
+import kiosk.Menu;
+import kiosk.OrderContext;
+import kiosk.OrderState;
+import kiosk.OrderStep;
 
 // STEP_START
-public class StepStart implements OrderStep{
+public class StepStart implements OrderStep {
 
     // 메뉴목록 선택(버거 메뉴, 치킨 메뉴, 음료 메뉴)
     private Menu selectMenu(OrderContext context, int input){

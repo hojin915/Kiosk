@@ -1,7 +1,12 @@
-package kiosk;
+package kiosk.step;
+
+import kiosk.MenuItem;
+import kiosk.OrderContext;
+import kiosk.OrderState;
+import kiosk.OrderStep;
 
 // STEP_MENUITEMS
-public class StepMenuItems implements OrderStep{
+public class StepMenuItems implements OrderStep {
     @Override
     public void handle(OrderContext context){
         // 이전 단게에서 가져온 menuItem

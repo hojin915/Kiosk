@@ -1,9 +1,10 @@
-package kiosk;
+package kiosk.step;
 
 import format.MoneyFormat;
+import kiosk.*;
 
 // STEP_DISCOUNT
-public class StepDiscount implements OrderStep{
+public class StepDiscount implements OrderStep {
     @Override
     public void handle(OrderContext context){
         ShoppingBasket basket = context.getBasketClass();

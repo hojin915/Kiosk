@@ -1,6 +1,10 @@
-package kiosk;
+package kiosk.step;
 
 import format.MoneyFormat;
+import kiosk.OrderContext;
+import kiosk.OrderState;
+import kiosk.OrderStep;
+import kiosk.ShoppingBasket;
 
 // STEP_BASKET
 public class StepBasket implements OrderStep {

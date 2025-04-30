@@ -1,7 +1,9 @@
-package kiosk;
+package kiosk.step;
+
+import kiosk.*;
 
 // STEP_MENUES
-public class StepMenu implements OrderStep{
+public class StepMenu implements OrderStep {
 
     // 메뉴목록중 선택한 메뉴 출력(버거 메뉴, 치킨 메뉴, 음료 메뉴)
     private void printSelectedMenu(OrderContext context, int input) {

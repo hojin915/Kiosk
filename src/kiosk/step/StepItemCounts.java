@@ -1,7 +1,9 @@
-package kiosk;
+package kiosk.step;
+
+import kiosk.*;
 
 // STEP_ITEMCOUNTS
-public class StepItemCounts implements OrderStep{
+public class StepItemCounts implements OrderStep {
     @Override
     public void handle(OrderContext context) {
         int maxOrderSize = 50;
