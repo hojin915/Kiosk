@@ -8,7 +8,6 @@ public class StepItemCounts implements OrderStep{
         MenuItem selectedMenuItem = context.getSelectedMenuItem();
         ShoppingBasket basket = context.getBasketClass();
 
-        // tempNum 값을 이용한 재출력 방지
         if(!context.getAlreadyPrinted()) {
             System.out.println(selectedMenuItem.getMenuName() + " 를 몇개 담으시겠습니까? (최대 " + maxOrderSize + " 개, 취소를 원하시면 0을 입력해주세요)");
         }
@@ -21,13 +20,16 @@ public class StepItemCounts implements OrderStep{
             basket.addMenuItem(selectedMenuItem, quantity);
             context.setBasketClass(basket);
             System.out.println(selectedMenuItem.getMenuName() + " " + quantity + " 개가 장바구니에 추가되었습니다.");
+
             context.clearOrderContext();
             context.setAlreadyPrinted(false);
+
             context.setState(OrderState.STEP_START);
         } else if (quantity == 0){
             context.setSelectMenuItemNum(0);
             context.setSelectedMenuItem(null);
             context.setAlreadyPrinted(false);
+
             context.setState(OrderState.STEP_MENUES);
         }
     }

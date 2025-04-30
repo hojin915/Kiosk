@@ -13,7 +13,9 @@ public class OrderContext {
     private final Scanner sc = new Scanner(System.in);
     private OrderState state = OrderState.STEP_START;   // 주문 단계(초기값 STEP_START)
 
-    // 매개변수와 같이 scan도 모든 단계에서 사용하기 때문에 context에 포함
+    // Kiosk 클래스에 있었지만 매개변수와 같이 scan도 모든 단계에서 사용하기 때문에 context에 포함
+    // 스캔 받을 때 숫자가 아니거나, 범위를 넘어가면 -1 리턴
+    // -1의 분기는 외부에서 처리해주기
     public int scan(int boundary) {
         int select;
         try {

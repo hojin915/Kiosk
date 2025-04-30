@@ -4,20 +4,16 @@ import format.Print;
 
 import java.util.*;
 
-public class Menu extends Print {
-    private int MenuId;
-    private String menuName;
-    private List<MenuItem> menuItems = new ArrayList<>();
+public class Menu {
+    private final int MenuId;
+    private final String menuName;
+    // List 의 값은 변경하지만 새로운 List 에 할당하지 않기 때문에 final List
+    private final List<MenuItem> menuItems = new ArrayList<>();
 
-    // menu 만들 때 필수적으로 메뉴이름까지 정하기
+    // menu 만들 때 필수적으로 Id, 이름 정하기
     public Menu(int MenuId, String menuName) {
         this.MenuId = MenuId;
         this.menuName = menuName;
-    }
-    public Menu() {}
-    // 한번에 메뉴리스트를 넣기
-    public void setMenuItems(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
     }
 
     // GETTER
@@ -36,8 +32,8 @@ public class Menu extends Print {
         this.menuItems.add(menuItem);
     }
 
-    @Override
-    public void printBody() {
+    // 메뉴의 List<MenuItem>을 형식에 맞춰서 출력
+    public void printMenu() {
         int menuItemNum = 1;
         System.out.println("< " + menuName + " >");
         for (MenuItem item : menuItems) {
@@ -46,5 +42,6 @@ public class Menu extends Print {
             item.printMenuItem(0);
             menuItemNum++;
         }
+        System.out.println("0 . 뒤로가기");
     }
 }

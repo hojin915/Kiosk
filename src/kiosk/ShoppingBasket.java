@@ -32,8 +32,10 @@ public class ShoppingBasket {
             System.out.println("Basket is empty");
         } else {
             // Map을 entrySet 들의 List로 바꾸고 MenuId에 대해 오름차순으로 정렬한다(버거 -> 치킨 -> 음료)
+            // MenuId가 같은 menuItem 끼리는 개수가 많은 순으로 내림차순 정렬한다
             List<Map.Entry<MenuItem, Integer>> entryList = new ArrayList<>(basket.entrySet());
-            entryList.sort((a, b) -> a.getKey().getMenuId() - b.getKey().getMenuId());
+            entryList.sort((a, b) -> a.getKey().getMenuId() == b.getKey().getMenuId() ? b.getValue() - a.getValue() : a.getKey().getMenuId() - b.getKey().getMenuId());
+
             for(Map.Entry<MenuItem, Integer> entry : entryList){
                 System.out.print(startNumber + " . ");
                 entry.getKey().printMenuItemWithQuantity(entry.getValue());
